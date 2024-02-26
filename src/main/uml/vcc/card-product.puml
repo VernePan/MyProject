@@ -1,0 +1,24 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+
+actor MOSS
+participant BOSS
+participant PINGPONG
+participant Qbit
+
+BOSS -> BOSS: 根据用户选择的渠道，调用不同的渠道接口
+alt pingpong
+
+    BOSS -> pingpong: /v2/vcc/open/card/product
+    pingpong -> BOSS: 返回
+
+else Qbit
+
+    BOSS -> Qbit: /open-api/v1/cards/bins
+    Qbit -> BOSS: 返回
+
+end
+BOSS -> BOSS: 保存数据
+
+@enduml
