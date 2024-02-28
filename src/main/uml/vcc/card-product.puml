@@ -4,21 +4,26 @@
 
 actor MOSS
 participant BOSS
-participant PINGPONG
+participant pingpong
 participant Qbit
 
-BOSS -> BOSS: 根据用户选择的渠道，调用不同的渠道接口
+== 初始化卡bin ==
+
+BOSS -> BOSS: 根据用户选择的渠道，调用对应的渠道接口
 alt pingpong
 
     BOSS -> pingpong: /v2/vcc/open/card/product
-    pingpong -> BOSS: 返回
+    pingpong -> BOSS: 返回卡bin数据
 
 else Qbit
 
     BOSS -> Qbit: /open-api/v1/cards/bins
-    Qbit -> BOSS: 返回
+    Qbit -> BOSS: 返回卡bin数据
+    BOSS -> Qbit: /open-api/v1/accounts/fees
+    Qbit -> BOSS:返回账户费率数据
 
 end
 BOSS -> BOSS: 保存数据
+
 
 @enduml

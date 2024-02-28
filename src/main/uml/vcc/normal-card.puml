@@ -1,0 +1,60 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor MOSS
+participant BOSS
+participant pingpong
+participant Qbit
+
+== 储值卡创建==
+    MOSS -> MOSS: 本地创建储值卡记录
+alt pingpong
+    MOSS -> pingpong: 创建储值卡 /v2/vcc/open/card/apply/sync
+    pingpong -> MOSS: 同步返回数据
+    MOSS -> MOSS: 更新本地储值卡记录
+else Qbit
+    MOSS -> MOSS: 本地创建储值卡
+    MOSS -> Qbit: 检查开卡请求参数 open-api/v1/cards/create/check
+    Qbit -> MOSS: 同步返回数据
+    MOSS -> Qbit: 创建储值卡 open-api/v1/cards
+    Qbit -> MOSS: 同步返回数据
+    Qbit ---> MOSS: 处理开卡回调消息
+    MOSS -> MOSS: 更新本地储值卡记录
+end
+
+== 储值卡充值/提现==
+
+    MOSS -> MOSS: 创建本地充值/提现记录
+alt pingpong
+    MOSS -> pingpong:储值卡充值/提现  充值接口v2/vcc/open/card/order/recharge/sync   提现接口/v2/vcc/open/card/order/charge-out/sync
+    pingpong -> MOSS:处理同步返回数据
+    MOSS -> MOSS: 更新本地充值/提现记录
+else Qbit
+    MOSS -> Qbit: 储值卡充值/提现 储值卡充值open-api/v1/cards/transfer/in   储值卡提现open-api/v1/cards/transfer/out
+    Qbit -> MOSS: 处理同步返回数据
+    Qbit ---> MOSS: 处理回调消息
+    MOSS -> MOSS: 更新本地充值/提现记录
+
+end
+
+== 储值卡冻结/解冻==
+alt pingpong
+    MOSS -> pingpong: 储值卡冻结/解冻 冻结接口/v2/vcc/open/card/block  解冻接口/v2/vcc/open/card/unblock
+    pingpong -> MOSS: 处理同步返回数据
+else Qbit
+    MOSS -> Qbit: 储值卡冻结/解冻  储值卡冻结open-api/v1/cards/suspend  储值卡解冻open-api/v1/cards/enable
+    Qbit -> MOSS: 处理同步返回数据
+
+end
+    MOSS -> MOSS: 更新本地卡状态
+
+== 储值卡注销==
+alt pingpong
+    MOSS -> pingpong: 储值卡注销  v2/vcc/open/card/applyForCancellation
+    pingpong -> MOSS: 处理同步返回数据
+else Qbit
+    MOSS -> Qbit: 储值卡注销  open-api/v1/cards
+    Qbit -> MOSS: 处理同步返回数据
+end
+    MOSS -> MOSS: 更新本地卡状态
+@enduml

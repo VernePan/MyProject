@@ -1,0 +1,92 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor MOSS
+participant BOSS
+participant pingpong
+participant Qbit
+
+== 创建额度组==
+    MOSS -> MOSS: 本地创建额度组
+alt pingpong
+    MOSS -> pingpong: 创建额度组预算   /v2/vcc/open/budget/create
+    pingpong -> MOSS: 处理同步返回数据
+    MOSS -> MOSS: 更新本地额度组信息
+else Qbit
+    MOSS -> Qbit: 创建额度组预算   open-api/v1/budget
+    Qbit -> MOSS: 处理同步返回数据
+    Qbit ---> MOSS: 处理回调消息
+    MOSS -> MOSS: 更新本地额度组信息
+
+end
+
+== 额度组进行充值/提现==
+    MOSS -> MOSS: 创建本地额度组充值记录
+alt pingpong
+    MOSS -> pingpong: 操作额度组预算进行充值/提现   /v2/vcc/open/account/transfer
+    pingpong -> MOSS: 处理同步返回数据
+    MOSS -> MOSS: 更新本地额度组充值记录
+else Qbit
+    MOSS -> Qbit:操作额度组预算进行充值/提现  充值open-api/v1/budget/add    提现open-api/v1/budget/sub
+    Qbit -> MOSS:处理同步返回数据
+    Qbit ---> MOSS:处理回调消息
+    MOSS -> MOSS: 更新本地额度组充值记录
+
+end
+== 创建额度卡==
+    MOSS -> MOSS: 本地创建额度卡
+alt pingpong
+    MOSS -> pingpong: 创建额度卡     /v2/vcc/open/card/apply/sync
+    pingpong -> MOSS: 处理同步返回数据
+    MOSS -> MOSS: 更新本地额度卡信息
+else Qbit
+    MOSS -> Qbit: 开卡前参数检查 open-api/v1/cards/create/check
+    Qbit -> MOSS: 处理同步返回数据
+    MOSS -> Qbit: 创建额度卡 open-api/v1/cards
+    Qbit -> MOSS: 处理同步返回数据
+    Qbit ---> MOSS: 处理回调消息
+    MOSS -> MOSS: 更新本地额度卡信息
+
+end
+== 额度卡冻结/解冻==
+alt pingpong
+    MOSS -> pingpong:额度卡冻结/解冻   冻结接口/v2/vcc/open/card/block  解冻接口/v2/vcc/open/card/unblock
+    pingpong -> MOSS:处理同步返回数据
+    MOSS -> MOSS: 更新本地卡状态
+else Qbit
+    MOSS -> Qbit: 额度卡冻结/解冻  额度卡冻结open-api/v1/cards/suspend  额度卡解冻open-api/v1/cards/enable
+    Qbit -> MOSS: 处理同步返回数据
+    Qbit ---> MOSS: 处理回调消息
+    MOSS -> MOSS: 更新本地卡状态
+
+end
+
+== 额度卡注销==
+alt pingpong
+    MOSS -> pingpong: 额度卡注销     /v2/vcc/open/card/applyForCancellation
+    pingpong -> MOSS: 处理同步返回数据
+    MOSS -> MOSS: 更新本地卡状态
+else Qbit
+    MOSS -> Qbit: 额度卡注销     open-api/v1/cards
+    Qbit -> MOSS: 处理同步返回数据
+    MOSS -> MOSS: 更新本地卡状态
+
+end
+
+
+'== 不同渠道组与组的转账==
+'alt pingpong
+'    MOSS -> MOSS:记一条本地第一阶段组与商户账户之间的的提现记录
+'    MOSS -> pingpong:进行第一阶段 对应渠道内转账（此处pp为示范）
+'    MOSS -> MOSS:更新第一条记录的状态（true/false）,如果为false禁止下一步操作并提示
+'    MOSS -> MOSS:根据第一条记录状态更新本地对应数据
+'    MOSS -> MOSS:记一条本地第二阶段组与商户账户之间的的充值记录（两条记录之间进行关联）
+'    MOSS -> Qbit:进行第二阶段 对应渠道内转账（此处qbit为示范）
+'    MOSS -> MOSS:更新第二条记录的状态（true/false）如果为true执行1-x,否则执行2-x
+'    MOSS -> MOSS:1-1 更新本地对应数据,并返回成功
+'    MOSS -> pingpong:2-1 进行对应渠道内转账（此处pp为示范）
+'    MOSS -> MOSS:2-2 更新本地对应数据
+'
+'end
+
+@enduml

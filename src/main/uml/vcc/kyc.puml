@@ -1,0 +1,15 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+
+actor MOSS
+participant BOSS
+participant pingpong
+participant Qbit
+
+
+== kyc审核通过 ==
+
+BOSS -> BOSS: 为商户创建本地账户
+
+@enduml

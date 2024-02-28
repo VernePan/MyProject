@@ -1,0 +1,12 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor MOSS
+participant BOSS
+participant pingpong
+participant Qbit
+
+== 商户账户充值 ==
+
+BOSS -> BOSS: 商户本地账户增加一笔金额，充值金额-手续费
+@enduml

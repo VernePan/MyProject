@@ -1,0 +1,26 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor MOSS
+participant BOSS
+participant pingpong
+participant Qbit
+
+== pingpong卡消费、退款、反转 ==
+
+pingpong --> MOSS: vcc.auth.transaction
+
+MOSS -> MOSS: 现有通用处理逻辑
+
+MOSS -> pingpong: /v2/vcc/open/clearings-record
+pingpong -> MOSS: 返回清算数据
+
+MOSS -> MOSS: 现有通用处理逻辑。
+
+== Qbit卡消费、退款、反转 ==
+
+Qbit --> MOSS: CardTransaction
+
+MOSS -> MOSS: 新增一个controller处理Qbit通知\n只处理Consumption、Credit 、Reversal\n这三种类型的消息
+
+@enduml
