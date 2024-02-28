@@ -8,38 +8,61 @@ participant Qbit
 
 == 创建额度组==
     MOSS -> MOSS: 本地创建额度组
+'alt pingpong
+'    MOSS -> pingpong: 创建额度组预算   /v2/vcc/open/budget/create
+'    pingpong -> MOSS: 处理同步返回数据
+'    MOSS -> MOSS: 更新本地额度组信息
+'else Qbit
+'    MOSS -> Qbit: 创建额度组预算   open-api/v1/budget
+'    Qbit -> MOSS: 处理同步返回数据
+'    Qbit ---> MOSS: 处理回调消息
+'    MOSS -> MOSS: 更新本地额度组信息
+'end
+
+== 额度组进行充值/提现==
+
+    MOSS -> MOSS: 创建本地额度组充值/提现记录
+    MOSS -> MOSS: 查询该组是否新建过额度卡
+    alt YES
+        MOSS -> MOSS: 查询该组是哪个渠道
+        alt pingpong
+            MOSS -> pingpong: 操作额度组预算进行充值/提现   /v2/vcc/open/account/transfer
+            pingpong -> MOSS: 处理同步返回数据
+            MOSS -> MOSS: 更新本地额度组充值/提现记录
+        else Qbit
+            MOSS -> Qbit:操作额度组预算进行充值/提现  充值open-api/v1/budget/add    提现open-api/v1/budget/sub
+            Qbit -> MOSS:处理同步返回数据
+            Qbit ---> MOSS:处理回调消息
+            MOSS -> MOSS: 更新本地额度组充值/提现记录
+        end
+    else NO
+        MOSS -> MOSS: 更新本地额度组充值/提现记录
+        MOSS -> MOSS: 更新额度组金额
+end
+
+== 创建额度卡==
+    MOSS -> MOSS: 本地创建额度卡
+    MOSS -> MOSS: 查询额度卡所在组的（充值-提现）金额
 alt pingpong
     MOSS -> pingpong: 创建额度组预算   /v2/vcc/open/budget/create
     pingpong -> MOSS: 处理同步返回数据
     MOSS -> MOSS: 更新本地额度组信息
+    MOSS -> MOSS: 新增本地额度组充值记录
+    MOSS -> pingpong: 操作额度组预算进行充值   /v2/vcc/open/account/transfer
+    pingpong -> MOSS: 处理同步返回数据
+    MOSS -> MOSS: 更新本地额度组充值记录
+    MOSS -> pingpong: 创建额度卡     /v2/vcc/open/card/apply/sync
+    pingpong -> MOSS: 处理同步返回数据
+    MOSS -> MOSS: 更新本地额度卡信息
 else Qbit
     MOSS -> Qbit: 创建额度组预算   open-api/v1/budget
     Qbit -> MOSS: 处理同步返回数据
     Qbit ---> MOSS: 处理回调消息
     MOSS -> MOSS: 更新本地额度组信息
-
-end
-
-== 额度组进行充值/提现==
-    MOSS -> MOSS: 创建本地额度组充值记录
-alt pingpong
-    MOSS -> pingpong: 操作额度组预算进行充值/提现   /v2/vcc/open/account/transfer
-    pingpong -> MOSS: 处理同步返回数据
-    MOSS -> MOSS: 更新本地额度组充值记录
-else Qbit
-    MOSS -> Qbit:操作额度组预算进行充值/提现  充值open-api/v1/budget/add    提现open-api/v1/budget/sub
+    MOSS -> Qbit:操作额度组预算进行充值  充值open-api/v1/budget/add
     Qbit -> MOSS:处理同步返回数据
     Qbit ---> MOSS:处理回调消息
     MOSS -> MOSS: 更新本地额度组充值记录
-
-end
-== 创建额度卡==
-    MOSS -> MOSS: 本地创建额度卡
-alt pingpong
-    MOSS -> pingpong: 创建额度卡     /v2/vcc/open/card/apply/sync
-    pingpong -> MOSS: 处理同步返回数据
-    MOSS -> MOSS: 更新本地额度卡信息
-else Qbit
     MOSS -> Qbit: 开卡前参数检查 open-api/v1/cards/create/check
     Qbit -> MOSS: 处理同步返回数据
     MOSS -> Qbit: 创建额度卡 open-api/v1/cards
