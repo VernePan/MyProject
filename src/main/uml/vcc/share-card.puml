@@ -97,19 +97,7 @@ else Qbit
 end
 
 
-'== 不同渠道组与组的转账==
-'alt pingpong
-'    MOSS -> MOSS:记一条本地第一阶段组与商户账户之间的的提现记录
-'    MOSS -> pingpong:进行第一阶段 对应渠道内转账（此处pp为示范）
-'    MOSS -> MOSS:更新第一条记录的状态（true/false）,如果为false禁止下一步操作并提示
-'    MOSS -> MOSS:根据第一条记录状态更新本地对应数据
-'    MOSS -> MOSS:记一条本地第二阶段组与商户账户之间的的充值记录（两条记录之间进行关联）
-'    MOSS -> Qbit:进行第二阶段 对应渠道内转账（此处qbit为示范）
-'    MOSS -> MOSS:更新第二条记录的状态（true/false）如果为true执行1-x,否则执行2-x
-'    MOSS -> MOSS:1-1 更新本地对应数据,并返回成功
-'    MOSS -> pingpong:2-1 进行对应渠道内转账（此处pp为示范）
-'    MOSS -> MOSS:2-2 更新本地对应数据
-'
-'end
+== 组与组互转不支持==
+
 
 @enduml

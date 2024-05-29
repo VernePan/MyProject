@@ -1,0 +1,36 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor MOSS
+participant BOSS
+participant penny
+
+== 储值卡创建==
+    MOSS -> MOSS: 开卡费扣除
+alt penny
+    MOSS -> penny: 创建储值卡 /v1/cards
+    penny -> MOSS: 同步返回数据
+    MOSS -> MOSS: 创建本地储值卡
+end
+
+== 储值卡充值/提现==
+
+    MOSS -> MOSS: 创建本地充值/提现记录
+alt penny
+    MOSS -> MOSS: 更新本地卡余额
+    MOSS -> MOSS: 更新本地充值/提现记录
+
+end
+
+== 储值卡冻结/解冻==
+alt penny
+    MOSS -> MOSS: 更新本地卡状态为冻结/解冻
+end
+
+== 储值卡注销==
+alt penny
+    MOSS -> penny: 储值卡注销  DELETE /v1/cards/{cardID}
+    penny -> MOSS: 返回结果
+end
+    MOSS -> MOSS: 更新本地卡状态
+@enduml

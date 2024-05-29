@@ -1,0 +1,21 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+
+actor MOSS
+participant BOSS
+participant penny
+
+== 初始化卡bin ==
+
+BOSS -> BOSS: 根据用户选择的渠道，调用对应的渠道接口
+alt penny
+
+    BOSS -> penny: /v1/cards/bins
+    penny -> BOSS: 返回卡bin数据
+
+end
+BOSS -> BOSS: 保存数据
+
+
+@enduml
