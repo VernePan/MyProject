@@ -12,6 +12,7 @@ alt penny
     penny -> MOSS: 同步返回数据
     MOSS -> MOSS: 创建本地储值卡
 end
+    MOSS -> MOSS: 开卡失败退回开卡费
 
 == 储值卡充值/提现==
 
@@ -24,13 +25,15 @@ end
 
 == 储值卡冻结/解冻==
 alt penny
-    MOSS -> MOSS: 更新本地卡状态为冻结/解冻
+    MOSS -> MOSS: 更新本地卡状态。无论渠道成功还是失败，都更新卡状态。
+    MOSS -> penny: 储值卡冻结解冻  PUT /v1/cards/{cardID}
+    penny -> MOSS: 返回结果
 end
 
 == 储值卡注销==
 alt penny
+    MOSS -> MOSS: 更新本地卡状态。无论渠道成功还是失败，都更新卡状态为注销。
     MOSS -> penny: 储值卡注销  DELETE /v1/cards/{cardID}
     penny -> MOSS: 返回结果
 end
-    MOSS -> MOSS: 更新本地卡状态
 @enduml

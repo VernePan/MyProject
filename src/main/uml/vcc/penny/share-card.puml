@@ -12,7 +12,7 @@ participant penny
 
     MOSS -> MOSS: 创建本地额度组充值/提现记录
     MOSS -> MOSS: 查询该组是否新建过额度卡
-    alt YES
+    alt 新建过额度卡
         MOSS -> MOSS: 查询该组是哪个渠道
         alt penny
         MOSS -> MOSS: 更新本地额度组充值/提现记录
@@ -25,14 +25,13 @@ participant penny
 end
 
 == 创建额度卡==
-    MOSS -> MOSS: 查询额度卡所在组的金额
+    MOSS -> MOSS: 开卡费扣除
 alt penny
-    MOSS -> penny: 创建额度卡  /v1/cards
-    penny -> MOSS: 处理同步返回数据
+    MOSS -> penny: 创建额度卡 /v1/cards
+    penny -> MOSS: 同步返回数据
     MOSS -> MOSS: 创建本地额度卡
-else 其他渠道 继续现有逻辑
-
 end
+    MOSS -> MOSS: 开卡失败退回开卡费
 
 
 == 额度卡冻结/解冻/注销，流程和逻辑和储值卡一致==
