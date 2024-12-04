@@ -1,12 +1,12 @@
 package leetcode.editor.cn;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class 颜色分类 {
 
     @Test
     public void test(){
-        int[] nums = new int[]{1,4,6,0,0,8,0};
+        int[] nums = new int[]{2,0,2,1,1,0};
         sortColors(nums);
     }
     // 刷油漆的思路，遍历每个元素刷次2，
@@ -26,11 +26,10 @@ public class 颜色分类 {
             if(num < 1){
                 nums[n0++] = 0;
             }
-            for (int num : nums) {
-                System.out.print(num + " ");
+            for (int num2 : nums) {
+                System.out.print(num2 + " ");
             }
             System.out.println();
         }
     }
-}
 }

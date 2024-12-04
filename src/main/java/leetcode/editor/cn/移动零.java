@@ -1,6 +1,6 @@
 package leetcode.editor.cn;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class 移动零 {
 
